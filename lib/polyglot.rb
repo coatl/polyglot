@@ -31,7 +31,7 @@ module Polyglot
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
     return if @loaded[file] # Check for $: changes or file time changes and reload?
     begin
-      source_file, loader = Polyglot.find(file, *a[1..-1], &b)
+      source_file, loader = Polyglot.find(file)
       if (loader)
         loader.load(source_file)
         @loaded[file] = true
@@ -54,7 +54,7 @@ module Kernel
     polyglot_original_require(*a, &b)
   rescue LoadError => load_error
     begin
-      Polyglot.load(*a, &b)
+      Polyglot.load(a)
     rescue LoadError
       # Raise the original exception, possibly a MissingSourceFile with a path
       raise load_error
