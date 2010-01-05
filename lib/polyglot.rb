@@ -106,8 +106,8 @@ end
 module Kernel
   alias polyglot_original_require require
 
-  def require(*a, &b)
-    polyglot_original_require(*a, &b)
+  def require(a)
+    Polyglot.try_dialects_require(a) or polyglot_original_require(a)
   rescue LoadError => load_error
     begin
       Polyglot.load(a)
