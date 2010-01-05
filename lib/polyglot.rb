@@ -70,6 +70,37 @@ module Polyglot
       end
     end
   end
+
+  def self.try_dialects_require(file)
+    file = file.to_str
+    raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
+    return if $".include? file
+
+    extensions=["rb"]
+    for name in %w[DLEXT DLEXT2] do
+      value=Config::CONFIG[name]
+      extensions<<value unless value.empty?
+    end
+    path=rawfind(file,extensions)
+    if /\.rb\Z/===path
+      $"<<file
+      f=File.open(path,"rb")
+      line=f.readline
+      line[0..2]='' if /\A\xEF\xBB\xBF/===line #skip utf8 bom if present
+      line=f.readline if /\A\#!/===line  #skip shebang line if present
+      line=f.readline if (line=~/^\s*#.*(?:en)?coding[:= ](.*)\s*$/) #skip encoding line if present
+      if f.readline[/^\s*Polyglot\.dialects\s*\(?\s*(.*)\s*\)?\s*$/] #look for dialects line
+        dialects=$1
+        dialects.split(/\s*,\s*/).map{|v| v[/^:(.*)$/,1].to_sym }
+        @registrations[huh].load(path)
+      end
+    end
+  end
+
+  def self.dialects(*names)
+    #don't do anything here;
+    #the 'macro' implementation of this method is in try_dialects_require, above
+  end
 end
 
 module Kernel
