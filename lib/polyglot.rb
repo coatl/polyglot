@@ -5,8 +5,7 @@ module Polyglot
   @loaded ||= {}
 
   def self.register(extension, klass)
-    extension = [extension] unless Enumerable === extension
-    extension.each{|e|
+    Array(extension).each{|e|
       @registrations[e] = klass
     }
   end
