@@ -10,18 +10,43 @@ module Polyglot
     }
   end
 
-  def self.find(file, *options, &block)
-    extensions = @registrations.keys*","
-    is_absolute = file[0] == File::SEPARATOR || file[0] == File::ALT_SEPARATOR || file =~ /\A[A-Z]:\\/i
-    (is_absolute ? [""] : $:).each{|lib|
-      base = is_absolute ? "" : lib+File::SEPARATOR
-      # In Windows, repeated SEPARATOR chars have a special meaning, avoid adding them
-      matches = Dir[base+file+".{"+extensions+"}"]
+  def self.find(file)
+    path=rawfind(file,@registrations.keys) or return nil
+    return [ path, @registrations[path.gsub(/.*\./,'')]]
+  end
+
+  def self.is_absolute?(file)
+    file[0] == File::SEPARATOR || file[0] == File::ALT_SEPARATOR || file =~ /\A[A-Z]:\\/i
+  end
+
+  def self.dirify(lib)
+    # In Windows, repeated SEPARATOR chars have a special meaning, avoid adding them
+    if /(\A\Z|[#{File::SEPARATOR}#{File::ALT_SEPARATOR}]\Z/o===lib; lib
+    else lib+File::SEPARATOR
+    end
+  end
+
+  def self.paths_to_try(file)
+    is_absolute?(file) ? [""] : $:
+  end
+
+  def self.add_exts_to_file(file,extensions)
+    unless extensions.include? file[/\.([^.]+)\Z/,1]
+      if extensions.size==1
+        file += ".{"+extensions+"}"
+      else
+        file += ".{"+extensions*','+"}"
+      end
+    end
+  end
+
+  def self.rawfind(file,extensions)
+    add_exts_to_file
+    paths_to_try(file).each{|lib|
+      matches = Dir[dirify(lib)+file]
       # Revisit: Should we do more do if more than one candidate found?
       $stderr.puts "Polyglot: found more than one candidate for #{file}: #{matches*", "}" if matches.size > 1
-      if path = matches[0]
-        return [ path, @registrations[path.gsub(/.*\./,'')]]
-      end
+      return path if path = matches[0]
     }
     return nil
   end
