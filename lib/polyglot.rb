@@ -1,4 +1,5 @@
-$:.unshift File.dirname(__FILE__)
+#$:.unshift File.dirname(__FILE__)
+require 'polyglot/check_for_absolute_path_in_LOADED_FEATURES'
 
 module Polyglot
   @registrations ||= {} # Guard against reloading
@@ -17,6 +18,37 @@ module Polyglot
 
   def self.is_absolute?(file)
     file[0] == File::SEPARATOR || file[0] == File::ALT_SEPARATOR || file =~ /\A[A-Z]:\\/i
+  end
+
+  if is_absolute?($".grep(%r{(\A|/)polyglot/check_for_absolute_path_in_LOADED_FEATURES\.rb\z}).first)
+    #ruby >=1.9
+    def self.in_LOADED_FEATURES?(file)
+      return $".include? file if is_absolute?(file) 
+      $".grep( %r{\A(
+                  #{$:.map{|dir| dir[%r{/\Z}]=''; Regexp.quote File.expand_path dir}.join("|")}
+                  )/
+                  #{Regexp.quote file}
+                  \z
+               }x
+      ).empty?
+    end
+
+    def self.add_to_LOADED_FEATURES(file)
+      return $"<<file if is_absolute?(file) 
+      fail
+      #abs=nil
+      #found=$:.find{|dir| dir[%r{/\Z}]=''; File.exist? abs=File.expand_path dir+"/"+file}
+      #$"<<abs if found
+    end
+  else
+    #ruby < 1.9
+    def self.in_LOADED_FEATURES?(file)
+      $".include? file 
+    end
+
+    def self.add_to_LOADED_FEATURES(file)
+      $"<<file
+    end
   end
 
   def self.dirify(lib)
