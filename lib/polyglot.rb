@@ -3,7 +3,6 @@ require 'polyglot/check_for_absolute_path_in_LOADED_FEATURES'
 
 module Polyglot
   @registrations ||= {} # Guard against reloading
-  @loaded ||= {}
 
   def self.register(extension, klass)
     Array(extension).each{|e|
