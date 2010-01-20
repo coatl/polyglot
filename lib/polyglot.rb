@@ -106,7 +106,7 @@ module Polyglot
   def self.try_dialects_require(file)
     file = file.to_str
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
-    return if in_LOADED_FEATURES? file #oops, needs to be absolute in 1.9...
+    return if in_LOADED_FEATURES? file
 
     extensions=["rb"]
     for name in %w[DLEXT DLEXT2] do
