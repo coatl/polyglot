@@ -86,12 +86,12 @@ module Polyglot
   def self.load(file)
     file = file.to_str
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
-    return if @loaded[file] # Check for $: changes or file time changes and reload?
+    return in_LOADED_FEATURES? file
     begin
       source_file, loader = Polyglot.find(file)
       if (loader)
         loader.load(source_file)
-        @loaded[file] = true
+        add_to_LOADED_FEATURES source_file
       else
         msg = "Failed to load #{file} using extensions #{(@registrations.keys+["rb"]).sort*", "}"
         if defined?(MissingSourceFile)
@@ -106,7 +106,7 @@ module Polyglot
   def self.try_dialects_require(file)
     file = file.to_str
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
-    return if $".include? file
+    return if in_LOADED_FEATURES? file #oops, needs to be absolute in 1.9...
 
     extensions=["rb"]
     for name in %w[DLEXT DLEXT2] do
@@ -115,7 +115,7 @@ module Polyglot
     end
     path=rawfind(file,extensions)
     if /\.rb\Z/===path
-      $"<<file
+      add_to_LOADED_FEATURES path
       f=File.open(path,"rb")
       line=f.readline
       line[0..2]='' if /\A\xEF\xBB\xBF/===line #skip utf8 bom if present
