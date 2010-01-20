@@ -83,7 +83,7 @@ module Polyglot
     return nil
   end
 
-  def self.load(file)
+  def self.require(file)
     file = file.to_str
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
     return in_LOADED_FEATURES? file
@@ -142,7 +142,7 @@ module Kernel
     Polyglot.try_dialects_require(a) or polyglot_original_require(a)
   rescue LoadError => load_error
     begin
-      Polyglot.load(a)
+      Polyglot.require(a)
     rescue LoadError
       # Raise the original exception, possibly a MissingSourceFile with a path
       raise load_error
