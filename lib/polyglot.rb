@@ -1,6 +1,6 @@
 #$:.unshift File.dirname(__FILE__)
-require 'polyglot/check_for_absolute_path_in_LOADED_FEATURES'
-require 'polyglot/dialect'
+require 'rbconfig'
+require "polyglot/dialect"
 
 module Polyglot
   @registrations ||= {} # Guard against reloading
@@ -20,7 +20,7 @@ module Polyglot
     file[0] == File::SEPARATOR || file[0] == File::ALT_SEPARATOR || file =~ /\A[A-Z]:\\/i
   end
 
-  if is_absolute?($".grep(%r{(\A|/)polyglot/check_for_absolute_path_in_LOADED_FEATURES\.rb\z}).first)
+  if is_absolute?($".grep(%r{(\A|/)polyglot/dialect\.rb\z}).first)
     #ruby >=1.9
     def self.in_LOADED_FEATURES?(file)
       return $".include? file if is_absolute?(file) 
