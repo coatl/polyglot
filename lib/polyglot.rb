@@ -119,7 +119,7 @@ module Polyglot
       line=f.readline
       line[0..2]='' if /\A\xEF\xBB\xBF/===line #skip utf8 bom if present
       line=f.readline if /\A\#!/===line  #skip shebang line if present
-      line=f.readline if (line=~/^\s*#.*(?:en)?coding[:= ](.*)\s*$/) #skip encoding line if present
+      line=f.readline if /^\s*#.*(?:en)?coding[:= ](.*)\s*$/===line #skip encoding line if present
       if f.readline[/^\s*Polyglot\.dialects\s*\(?\s*(.*)\s*\)?\s*$/] #look for dialects line
         dialects=$1
         dialects.split(/\s*,\s*/).map{|v| v[/^:(.*)$/,1].to_sym }
