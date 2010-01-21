@@ -115,7 +115,7 @@ module Polyglot
     path=rawfind(file,extensions)
     if /\.rb\Z/===path
       add_to_LOADED_FEATURES path
-      f=File.open(path,"rb")
+      File.open(path,"rb"){|f|
       line=f.readline
       line[0..2]='' if /\A\xEF\xBB\xBF/===line #skip utf8 bom if present
       line=f.readline if /\A\#!/===line  #skip shebang line if present
@@ -125,6 +125,7 @@ module Polyglot
         dialects.split(/\s*,\s*/).map{|v| v[/^:(.*)$/,1].to_sym }
         Dialect.make_chain(*dialects.map{|d| @registrations[d] }).load(path)
       end
+      }
     end
   end
 
