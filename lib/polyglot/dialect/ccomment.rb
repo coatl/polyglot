@@ -1,3 +1,4 @@
+require 'rubylexer'
 module Polyglot
   class Dialect
 
