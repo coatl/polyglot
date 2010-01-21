@@ -20,7 +20,7 @@ module Polyglot
 
     def self.make_chain(*dialects)
       prio2dialects=Hash.new{|h,k| h[k]=[] }
-      dialects.each{|dialect| prio2dialects[dialect.priority]=dialect }
+      dialects.each{|dialect| prio2dialects[dialect.priority]<<dialect }
       list=prio2dialects.keys.sort.map{|prio| 
         list=prio2dialects[prio]
         list.first.chain_class.new(*list) 
