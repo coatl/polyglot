@@ -15,7 +15,7 @@ module Polyglot
             @linenum+=contents.count("\n")
             RubyLexer::IgnoreToken.new(contents,start)
           else
-            move -2
+            @file.move -2
             super
           end
         end
