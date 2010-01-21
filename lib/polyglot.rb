@@ -87,7 +87,7 @@ module Polyglot
   def self.require(file)
     file = file.to_str
     raise SecurityError, "insecure operation on #{file}" if $SAFE>0 and file.tainted?
-    return in_LOADED_FEATURES? file
+    return if in_LOADED_FEATURES?( file )
     begin
       source_file, loader = Polyglot.find(file)
       if (loader)
