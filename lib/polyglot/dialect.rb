@@ -33,7 +33,7 @@ module Polyglot
         alias noncollapsing_new new
         def new *args
           list=[]
-          args.each{|arg| arg.class==self ? list.concat arg : list<<arg }
+          args.each{|arg| arg.class==self ? list.concat(arg) : list<<arg }
           noncollapsing_new list
         end
       end

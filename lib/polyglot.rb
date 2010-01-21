@@ -23,9 +23,9 @@ module Polyglot
   if is_absolute?($".grep(%r{(\A|/)polyglot/dialect\.rb\z}).first)
     #ruby >=1.9
     def self.in_LOADED_FEATURES?(file)
-      return $".include? file if is_absolute?(file) 
+      return $".include?( file ) if is_absolute?(file) 
       $".grep( %r{\A(
-                  #{$:.map{|dir| dir[%r{/\Z}]=''; Regexp.quote File.expand_path dir}.join("|")}
+                  #{$:.map{|dir| dir[%r{/\z}]=''; Regexp.quote File.expand_path( dir )}.join("|")}
                   )/
                   #{Regexp.quote file}
                   \z
