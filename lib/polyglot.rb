@@ -63,12 +63,12 @@ module Polyglot
   end
 
   def self.add_exts_to_file(file,extensions)
-    unless extensions.include? file[/\.([^.]+)\Z/,1]
-      if extensions.size==1
-        file += ".{"+extensions+"}"
-      else
-        file += ".{"+extensions*','+"}"
-      end
+    if extensions.include? file[/\.([^.]+)\z/,1]
+      file
+#    elsif extensions.size==1
+#      file += ".{"+extensions[0]+"}"
+    else
+      file += ".{"+extensions*','+"}"
     end
   end
 
