@@ -85,7 +85,6 @@ module Polyglot
         def result.print x; self<<x end
         begin
           t=lexer.get1token
-p t
           printer.pprint t, result
         end until RubyLexer::EoiToken===t
         result
