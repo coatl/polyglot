@@ -151,4 +151,7 @@ module Kernel
       raise load_error
     end
   end
+ 
+  alias unpolyglotted_eval eval
+  public :unpolyglotted_eval
 end
