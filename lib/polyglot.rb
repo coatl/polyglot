@@ -124,8 +124,8 @@ module Polyglot
       line=f.readline if /^\s*#.*(?:en)?coding[:= ](.*)\s*$/===line #skip encoding line if present
       if line[/^\s*Polyglot\.dialects?\s*\(?\s*(.*)\s*\)?\s*$/] #look for dialects line
         dialects=$1
-        dialects.split(/\s*,\s*/).map{|v| v[/^:(.*)$/,1].to_sym }
-        Dialect.make_chain(*dialects.map{|d| @registrations[d] }).load(path)
+        dialects=dialects.split(/\s*,\s*/).map!{|v| v[/^:(.*)$/,1].to_sym }
+        Dialect.make_chain(*dialects.map{|d| @registrations[d].new }).load(path)
       end
       }
     end
