@@ -33,8 +33,8 @@ module Polyglot
       ).empty?
     end
 
-    def self.add_to_LOADED_FEATURES(file)
-      return $"<<file if is_absolute?(file) 
+    def self.add_to_LOADED_FEATURES(file,longfile)
+      return $"<<longfile if is_absolute?(longfile) 
       fail
       #abs=nil
       #found=$:.find{|dir| dir[%r{/\Z}]=''; File.exist? abs=File.expand_path dir+"/"+file}
@@ -46,7 +46,7 @@ module Polyglot
       $".include? file 
     end
 
-    def self.add_to_LOADED_FEATURES(file)
+    def self.add_to_LOADED_FEATURES(file,longfile)
       $"<<file
     end
   end
@@ -92,7 +92,7 @@ module Polyglot
       source_file, loader = Polyglot.find(file)
       if (loader)
         loader.load(source_file)
-        add_to_LOADED_FEATURES source_file
+        add_to_LOADED_FEATURES file,source_file
       else
         msg = "Failed to load #{file} using extensions #{(@registrations.keys+["rb"]).sort*", "}"
         if defined?(MissingSourceFile)
@@ -115,8 +115,8 @@ module Polyglot
       extensions<<value unless value.empty?
     end
     path=rawfind(file,extensions)
-    if /\.rb\Z/===path
-      add_to_LOADED_FEATURES path
+    if /\.rb\z/===path
+      add_to_LOADED_FEATURES file,path
       File.open(path,"rb"){|f|
       line=f.readline
       line[0..2]='' if /\A\xEF\xBB\xBF/===line #skip utf8 bom if present
