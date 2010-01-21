@@ -2,19 +2,12 @@ module Polyglot
   class Dialect
     def load(path)
       src=File.read(path)
-      eval src, path, 1, TOPLEVEL_BINDING.dup
+      eval src, TOPLEVEL_BINDING.dup, path, 1
     end
 
-    def eval src, *rest
-      rest.push rest.shift if Binding===rest.first
-      rest.unshift "(eval)" unless String===rest.first
-      rest[1,0]=1 unless Integer===rest[1]
-      rest.push Binding.of_caller unless Binding===rest.last
-      fail if rest.size>3
-      file,line,binding=*rest
-
+    def eval src, binding=Binding.of_caller, file="(eval)", line=1
       src=transform src, file, line, binding
-      ::Kernel::unpolyglotted_eval src, file, line, binding #but this could be recursive!
+      ::Kernel::unpolyglotted_eval src, binding, file, line
     end
 
     def transform src, *rest
