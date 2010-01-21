@@ -123,7 +123,7 @@ module Polyglot
       if f.readline[/^\s*Polyglot\.dialects\s*\(?\s*(.*)\s*\)?\s*$/] #look for dialects line
         dialects=$1
         dialects.split(/\s*,\s*/).map{|v| v[/^:(.*)$/,1].to_sym }
-        @registrations[huh].load(path)
+        Dialect.make_chain(*dialects.map{|d| @registrations[d] }).load(path)
       end
     end
   end
