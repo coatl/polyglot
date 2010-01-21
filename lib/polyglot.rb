@@ -73,14 +73,15 @@ module Polyglot
   end
 
   def self.rawfind(file,extensions)
-    add_exts_to_file
-    paths_to_try(file).each{|lib|
+    file=add_exts_to_file(file,extensions)
+    result=nil
+    paths_to_try(file).find{|lib|
       matches = Dir[dirify(lib)+file]
       # Revisit: Should we do more do if more than one candidate found?
       $stderr.puts "Polyglot: found more than one candidate for #{file}: #{matches*", "}" if matches.size > 1
-      return path if path = matches[0]
+      result=matches[0]
     }
-    return nil
+    return result
   end
 
   def self.require(file)
