@@ -37,7 +37,7 @@ module Polyglot
       return $"<<longfile if is_absolute?(longfile) 
       fail
       #abs=nil
-      #found=$:.find{|dir| dir[%r{/\Z}]=''; File.exist? abs=File.expand_path dir+"/"+file}
+      #found=$:.find{|dir| dir[%r{/\z}]=''; File.exist? abs=File.expand_path dir+"/"+file}
       #$"<<abs if found
     end
   else
@@ -53,7 +53,7 @@ module Polyglot
 
   def self.dirify(lib)
     # In Windows, repeated SEPARATOR chars have a special meaning, avoid adding them
-    if /(\A\Z|[#{File::SEPARATOR}#{File::ALT_SEPARATOR}]\Z/o===lib; lib
+    if /(\A\z|[#{File::SEPARATOR}#{File::ALT_SEPARATOR}]\z)/o===lib; lib
     else lib+File::SEPARATOR
     end
   end
