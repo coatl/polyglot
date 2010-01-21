@@ -135,6 +135,7 @@ module Polyglot
     #don't do anything here;
     #the 'macro' implementation of this method is in try_dialects_require, above
   end
+  class<<self; alias dialect dialects; end
 end
 
 module Kernel
