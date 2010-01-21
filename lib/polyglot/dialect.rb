@@ -65,7 +65,9 @@ module Polyglot
     attr_reader :lexer_mixin,:parser_mixin,:tree_rewriter
 
     def transform src, file,line,binding
-      lexer=RubyLexer.new(file,src,line,huh(binding))
+      lvars=eval "local_variables", binding
+      lexer=RubyLexer.new(file,src,line)
+      lvars.each{|lvar| lexer.localvars[lvar]=true }
       x= lexer_mixin; lexer.extend x if x 
       parser=RedParse.new(lexer,file,line,huh(binding))
       x= parser_mixin; parser.extend x if x 
