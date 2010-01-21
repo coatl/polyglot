@@ -69,23 +69,57 @@ module Polyglot
       lexer=RubyLexer.new(file,src,line)
       lvars.each{|lvar| lexer.localvars[lvar]=true }
       x= lexer_mixin; lexer.extend x if x 
-      parser=RedParse.new(lexer,file,line,huh(binding))
-      x= parser_mixin; parser.extend x if x 
 
-      @tree_rewriter[parser.parse].unparse({})
+      if parser_mixin or @tree_rewriter
+        parser=RedParse.new(lexer,file,line,huh(binding))
+        x= parser_mixin; parser.extend x if x 
+
+        @tree_rewriter[parser.parse].unparse({})
+      else RedParseDialect.unlex lexer
+      end
+    end
+
+    def self.unlex lexer #this ought to be in rubylexer
+        printer=RubyLexer::KeepWsTokenPrinter.new('',1,0)
+        result=''
+        def result.print x; self<<x end
+        begin
+          t=lexer.get1token
+p t
+          printer.pprint t, result
+        end until RubyLexer::EoiToken===t
+        result
     end
 
     class Chain<Dialect::Chain
       def priority; 2 end
       def transform src, file,line,binding
-        lexer=RubyLexer.new(file,src,line,huh(binding))
-        @list.each{|x| x= x.lexer_mixin; lexer.extend x if x }
-        parser=RedParse.new(lexer,file,line,huh(binding))
-        @list.each{|x| x= x.parser_mixin; parser.extend x if x }
+        lvars=::Kernel::unpolyglotted_eval "local_variables", binding
+        lexer=RubyLexer.new(file,src,line)
+        lvars.each{|lvar| lexer.localvars[lvar]=true }
+        lexer_mixins.each{|x| lexer.extend x if x }
+
+        parser_mixins,tree_rewriters=parser_mixins(),tree_rewriters()
+
+        if parser_mixins.compact.empty? and tree_rewriters.compact.empty?
+          RedParseDialect.unlex lexer
+        else
+          parser=RedParse.new(lexer,file,line,huh(binding))
+          parser_mixins.each{|x| parser.extend x if x }
       
-        tree=parser.parse
-        @list.each{|x| x= x.tree_rewriter; tree=x[tree] if x }
-        tree.unparse({})
+          tree=parser.parse
+          tree_rewriters.each{|x| tree=x[tree] if x }
+          tree.unparse({})
+        end
+      end
+      def lexer_mixins
+        @list.map{|x| x.lexer_mixin }
+      end
+      def parser_mixins
+        @list.map{|x| x.parser_mixin }
+      end
+      def tree_rewriters
+        @list.map{|x| x.tree_rewriter }
       end
     end
   end
