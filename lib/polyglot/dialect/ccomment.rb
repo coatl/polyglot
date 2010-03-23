@@ -9,9 +9,8 @@ module Polyglot
 
       module LexerHack
         def regex_or_div ch
-          if read(2)=='/*'
-            start=input_position-2
-            contents=@file.scan %r{(?: [^\*] | \*[^/] )* \*/}mx
+          start=input_position
+          if contents=@file.scan %r{/\* (?: [^\*] | \*[^/] )* \*/}mx
             @linenum+=contents.count("\n")
             RubyLexer::IgnoreToken.new(contents,start)
           else
